@@ -238,17 +238,28 @@ public class App {
 
                 System.out.println("Total de Vuelos completos " + vuelosCompletos.size());
 
-                /* Solucion al Pto 2 */
+                /* Solucion al Pto 2. Ejercicio al margen 1 */
 
-                List<Vuelo> vuelosHoy = vuelosDestinosDiferentes.stream()
+                String destinos = vuelosDestinosDiferentes.stream()
                                 .filter(vuelo -> vuelo.getFechaSalida().isEqual(LocalDate.now()))
+                                .map(Vuelo::getDestino)
+                                .collect(Collectors.joining(", "));
+
+                // Comprobar el resultado
+                System.out.println("Solucion al punto 2. Ejercicio al margen 1");
+                System.out.println(destinos);
+
+                /* Solucion al Pto 2. Ejercicio al margen 1 */
+
+                List<String> listaDestinos = vuelosDestinosDiferentes.stream()
+                                .filter(vuelo -> vuelo.getFechaSalida().isEqual(LocalDate.now()))
+                                .map(Vuelo::getDestino)
                                 .collect(Collectors.toList());
 
                 // Comprobar el resultado
-                List<LocalDate> fechasDeHoy = vuelosHoy.stream()
-                                .map(v -> v.getFechaSalida()).collect(Collectors.toList());
+                System.out.println("Solucion al punto 2. Ejercicio al margen 2");
+                System.out.println(listaDestinos);
 
-                System.out.println("Fechas de hoy : " + fechasDeHoy);
 
                 /* Solucion al Pto 3 */
 
