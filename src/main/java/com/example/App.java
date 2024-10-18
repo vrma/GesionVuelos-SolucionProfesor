@@ -24,8 +24,8 @@ public class App {
 
         public static void main(String[] args) {
 
-                // Vuelos a destinos diferentes
-                List<Vuelo> vuelosDestinosDiferentes = new ArrayList<>();
+                // Se incluyen vuelos a un mismo destino
+                List<Vuelo> vuelosMismoDestino = new ArrayList<>();
 
                 // Solucion al punto a). Crear vuelos a tres destinos diferentes.
 
@@ -136,7 +136,7 @@ public class App {
                                 .build();
 
                 vuelo2 = Vuelo.builder()
-                                .destino("Barcelona")
+                                .destino("Tokio")
                                 .precio(99.99)
                                 .fechaSalida(LocalDate.now())
                                 .horaSalida(LocalTime.of(7, 45))
@@ -226,13 +226,13 @@ public class App {
                 vuelo3.setPasajeros(pasajerosVuelo3ListaDefinitiva);
 
                 // Creamos la lista de Vuelos
-                vuelosDestinosDiferentes.add(vuelo1);
-                vuelosDestinosDiferentes.add(vuelo2);
-                vuelosDestinosDiferentes.add(vuelo3);
+                vuelosMismoDestino.add(vuelo1);
+                vuelosMismoDestino.add(vuelo2);
+                vuelosMismoDestino.add(vuelo3);
 
                 /* Solucion Pto 1 */
 
-                List<Vuelo> vuelosCompletos = vuelosDestinosDiferentes.stream()
+                List<Vuelo> vuelosCompletos = vuelosMismoDestino.stream()
                                 .filter(vuelo -> vuelo.getPasajeros().size() == vuelo.getNumeroPlazas())
                                 .collect(Collectors.toList());
 
@@ -240,7 +240,7 @@ public class App {
 
                 /* Solucion al Pto 2. Ejercicio al margen 1 */
 
-                String destinos = vuelosDestinosDiferentes.stream()
+                String destinos = vuelosMismoDestino.stream()
                                 .filter(vuelo -> vuelo.getFechaSalida().isEqual(LocalDate.now()))
                                 .map(Vuelo::getDestino)
                                 .collect(Collectors.joining(", "));
@@ -251,7 +251,7 @@ public class App {
 
                 /* Solucion al Pto 2. Ejercicio al margen 1 */
 
-                List<String> listaDestinos = vuelosDestinosDiferentes.stream()
+                List<String> listaDestinos = vuelosMismoDestino.stream()
                                 .filter(vuelo -> vuelo.getFechaSalida().isEqual(LocalDate.now()))
                                 .map(Vuelo::getDestino)
                                 .collect(Collectors.toList());
@@ -263,14 +263,14 @@ public class App {
 
                 /* Solucion al Pto 3 */
 
-                List<Vuelo> vuelosMas10Horas = vuelosDestinosDiferentes.stream()
+                List<Vuelo> vuelosMas10Horas = vuelosMismoDestino.stream()
                                 .filter(vuelo -> vuelo.getDuracion() > 10)
                                 .collect(Collectors.toList());
 
                 System.out.println("Vuelos de mas de 10 horas de duracion " + vuelosMas10Horas);
 
                 /* Solucion al Pto. 4 */
-                List<Vuelo> vuelosMas24Horas = vuelosDestinosDiferentes.stream()
+                List<Vuelo> vuelosMas24Horas = vuelosMismoDestino.stream()
                                 .filter(vuelo -> vuelo.getDuracion() > 24)
                                 .collect(Collectors.toList());
 
@@ -280,16 +280,16 @@ public class App {
 
                 // Primero: Recuperar el precio mas alto
                 // final Double precioMaximo =
-                // vuelosDestinosDiferentes.stream().mapToDouble(Vuelo::getPrecio).max().orElse(0.0);
+                // vuelosMismoDestino.stream().mapToDouble(Vuelo::getPrecio).max().orElse(0.0);
 
-                // Vuelo vueloPrecioMaximo = vuelosDestinosDiferentes.stream().filter(v ->
+                // Vuelo vueloPrecioMaximo = vuelosMismoDestino.stream().filter(v ->
                 // v.getPrecio() == precioMaximo).findAny().get();
 
                 // System.out.println(vueloPrecioMaximo);
 
                 // Magnifica Solucion de Ivan
 
-                Vuelo vueloMayorPrecio = vuelosDestinosDiferentes.stream()
+                Vuelo vueloMayorPrecio = vuelosMismoDestino.stream()
                                 .max(
                                                 (Vuelo v1, Vuelo v2) -> Double.valueOf(v1.getPrecio())
                                                                 .compareTo(v2.getPrecio()))
@@ -301,15 +301,50 @@ public class App {
 
                 // Primero: Considerando que los vuelos son a destinos diferentes
 
-                Map<String, List<Pasajero>> pasajerosPorDestino = vuelosDestinosDiferentes.stream()
-                                .collect(Collectors.toMap(Vuelo::getDestino, Vuelo::getPasajeros));
+               
+                // Map<String, List<Pasajero>> pasajerosPorDestino = vuelosMismoDestino.stream()
+                //                 .collect(Collectors.toMap(Vuelo::getDestino, Vuelo::getPasajeros));
 
-                System.out.println("PASAJEROS POR DESTINO");
-                System.out.println(pasajerosPorDestino);
+                // System.out.println("PASAJEROS POR DESTINO");
+                // System.out.println(pasajerosPorDestino);
+
+                /* Solucion al Pto. 6, considerando vuelos al mismo destino */
+
+                // VARIANTE DE SOLUCION, CON GROUPING BY, Recuperando las listas de pasajeros de cada vuelo
+                Map<String, List<List<Pasajero>>> pasajerosPorDestinosRepetidos;
+
+                pasajerosPorDestinosRepetidos = vuelosMismoDestino.stream()
+                        .collect(Collectors.groupingBy(Vuelo::getDestino,
+                                Collectors.mapping(Vuelo::getPasajeros, 
+                                        Collectors.toList())));
+                
+                // VARIANTE DE SOLUCION, CON GROUPING BY, PERO Aplanando (Flatting) la lista de pasajeros
+                // resultante de cad vuelo
+                Map<String, List<Pasajero>> pasajerosPorDestinosRepetidosFlatting;
+
+                pasajerosPorDestinosRepetidosFlatting = vuelosMismoDestino.stream()
+                        .collect(Collectors.groupingBy(Vuelo::getDestino,
+                                Collectors.mapping(Vuelo::getPasajeros, 
+                                        Collectors.flatMapping(pasajeros -> pasajeros.stream(), 
+                                              Collectors.toList()))));
+
+                // VARIANTE DE SOLUCION UTILIZANDO toMap
+
+                Map<String, List<Pasajero>> pasajerosPorDestinosRepetidosConToMap;
+
+                pasajerosPorDestinosRepetidosConToMap = vuelosMismoDestino.stream()
+                        .collect(Collectors.toMap(Vuelo::getDestino, 
+                                Vuelo::getPasajeros, (lista1, lista2) -> {
+                                        
+                                        lista1.addAll(lista2);
+
+                                        return lista1;
+                                }));
+
 
                 /* Solucion al Pto. 7 */
 
-                List<Vuelo> vuelos10DiasAntesMesEnCurso = vuelosDestinosDiferentes.stream()
+                List<Vuelo> vuelos10DiasAntesMesEnCurso = vuelosMismoDestino.stream()
                                 .filter(vuelo -> vuelo.getFechaSalida()
                                                 .with(TemporalAdjusters.lastDayOfMonth()).minusDays(10)
                                                 .isBefore(vuelo.getFechaSalida()))
@@ -335,8 +370,8 @@ public class App {
 
                 /* Solucion al Pto. 8 */
 
-                Map<Sexo, Map<Long, List<Pasajero>>> pasajerosPorSexoYEdad = vuelosDestinosDiferentes.stream()
-                                .map(Vuelo::getPasajeros).flatMap(listaDePasajero -> listaDePasajero.stream())
+                Map<Sexo, Map<Long, List<Pasajero>>> pasajerosPorSexoYEdad = vuelosMismoDestino.stream()
+                        .map(Vuelo::getPasajeros).flatMap(listaDePasajero -> listaDePasajero.stream())
                                 .collect(Collectors.groupingBy(Pasajero::getSexo,
                                                 Collectors.groupingBy(Pasajero::getEdad)));
 
@@ -422,7 +457,7 @@ public class App {
                 /* Solucion al Pto. 11 */
 
                 // VARIANTE # 1
-                Map<Long, String> nombrePasajeroPorDuracionDelViaje = vuelosDestinosDiferentes.stream()
+                Map<Long, String> nombrePasajeroPorDuracionDelViaje = vuelosMismoDestino.stream()
                         .collect(Collectors.groupingBy(Vuelo::getDuracion, 
                                 Collectors.mapping(Vuelo::getPasajeros, 
                                         Collectors.flatMapping(lista -> lista.stream(), 
@@ -432,7 +467,7 @@ public class App {
                                                                         Collectors.joining(";"))))));
 
                 // VARIANTE # 2
-                Map<Long, List<String>> nombrePasajeroPorDuracionDelViaje2 = vuelosDestinosDiferentes.stream()
+                Map<Long, List<String>> nombrePasajeroPorDuracionDelViaje2 = vuelosMismoDestino.stream()
                         .collect(Collectors.groupingBy(Vuelo::getDuracion, 
                                 Collectors.mapping(Vuelo::getPasajeros, 
                                         Collectors.flatMapping(lista -> lista.stream(), 
@@ -455,7 +490,7 @@ public class App {
                 // Implica crear un mapa que agrupe pasajeros por duracion del viaje, y posteriormente
                 // ordenar las claves del mapa, con un TreeMap
 
-                Map<Long, List<Pasajero>> pasajerosPorDuracion = vuelosDestinosDiferentes.stream()
+                Map<Long, List<Pasajero>> pasajerosPorDuracion = vuelosMismoDestino.stream()
                         .collect(Collectors.groupingBy(Vuelo::getDuracion, 
                                 Collectors.mapping(Vuelo::getPasajeros,  
                                         Collectors.flatMapping(lista -> lista.stream(),
@@ -474,7 +509,7 @@ public class App {
                 /* Solucion al Pto. 13 */
 
                 // VARIANTE # 1
-                vuelosDestinosDiferentes.stream().forEach(vuelo -> {
+                vuelosMismoDestino.stream().forEach(vuelo -> {
 
                        LocalDate fechaSalida =  vuelo.getFechaSalida();
                        LocalTime horaSalida = vuelo.getHoraSalida();
@@ -489,7 +524,7 @@ public class App {
                 });
 
                 // VARIANTE # 2. Solucion de Ruben
-                vuelosDestinosDiferentes.stream()
+                vuelosMismoDestino.stream()
                         .filter(v -> v.getFechaSalida().atTime(v.getHoraSalida()).isBefore(LocalDateTime.now().plusHours(3)) 
                                 && v.getFechaSalida().atTime(v.getHoraSalida()).isAfter(LocalDateTime.now()))
                         .forEach(v -> v.getPasajeros().forEach(pasajero -> System.out.println("Buen viaje:  " + pasajero )));  
@@ -503,7 +538,7 @@ public class App {
                 // Otro aporte de Ruben y Guerrero, que seria valido
                 // si el enum estuviese en Español
 
-                // Map<DayOfWeek, List<Pasajero>> pasajerosPorDia = vuelosDestinosDiferentes.stream()
+                // Map<DayOfWeek, List<Pasajero>> pasajerosPorDia = vuelosMismoDestino.stream()
                 //    .collect(Collectors.groupingBy(v -> DayOfWeek.valueOf(v.getFechaSalida().getDayOfWeek()
                 //         .getDisplayName(TextStyle.FULL, Locale.of("es", "ES"))), 
                 //                 Collectors.mapping(Vuelo::getPasajeros, 
@@ -519,7 +554,7 @@ public class App {
                         
                 // );
 
-                Map<DayOfWeek, List<Pasajero>> pasajerosPorDia = vuelosDestinosDiferentes.stream()
+                Map<DayOfWeek, List<Pasajero>> pasajerosPorDia = vuelosMismoDestino.stream()
                    .collect(Collectors.groupingBy(v -> v.getFechaSalida().getDayOfWeek(), 
                                 Collectors.mapping(Vuelo::getPasajeros, 
                                         Collectors.flatMapping(pasajeros -> pasajeros.stream(), 
@@ -539,7 +574,7 @@ public class App {
 
                 /* Solucion al Pto. 16 */
 
-                List<Vuelo> vuelosNoMesEnCurso = vuelosDestinosDiferentes.stream()
+                List<Vuelo> vuelosNoMesEnCurso = vuelosMismoDestino.stream()
                         .filter(v -> ! v.getFechaSalida().getMonth().equals(LocalDate.now().getMonth()))
                         .collect(Collectors.toList());
 
