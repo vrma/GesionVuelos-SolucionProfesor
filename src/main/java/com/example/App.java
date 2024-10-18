@@ -344,20 +344,34 @@ public class App {
 
                 System.out.println(pasajerosPorSexoYEdad);
 
-                /* Solucion al Pto. 9 */
+                /* Solucion al Pto. 9. Ejercicio al margen 3 */
 
-                System.out.println("Pto 9 ...");
+                Map<Sexo, Map<Long, List<Pasajero>>> pasajerosPorSexoYEdadOrdenado;
+
+                pasajerosPorSexoYEdadOrdenado = new TreeMap<>(Collections.reverseOrder());
+
+                pasajerosPorSexoYEdadOrdenado.putAll(pasajerosPorSexoYEdad);
+
+                System.out.println("Ejercicio # 3 ... al margen");
+                System.out.println(pasajerosPorSexoYEdadOrdenado);
+
+                /* Ejercicio 4 ... Al margen.
+                 * Ordenar el mapa del Pto. 8 por la edad, de mayor a menor
+                 */
+
+                System.out.println("EJERCICIO 4 ... al magen, sugerido por Antonio");
                 pasajerosPorSexoYEdad.entrySet().forEach(entry1 -> {
-                        System.out.println("Del Sexo: " + entry1.getKey());
-                        Map<Long, List<Pasajero>> valor = entry1.getValue();
-                        valor.entrySet().forEach(entry2 -> {
-                                System.out.println("Y edad " + entry2.getKey());
 
-                                List<Pasajero> pasajeros = entry2.getValue();
+                        Map<Long, List<Pasajero>> pasajerosPorEdad = entry1.getValue();
 
-                                pasajeros.stream().sorted().forEach(System.out::println);
+                        Map<Long, List<Pasajero>> pasajerosPorEdadOrdenado;
+                        pasajerosPorEdadOrdenado = new TreeMap<>(Collections.reverseOrder());
 
-                        });
+                        pasajerosPorEdadOrdenado.putAll(pasajerosPorEdad);
+
+                        System.out.println("Pasajeros Ordenados por la Edad, en orden descendente ");
+
+                        System.out.println(pasajerosPorEdadOrdenado);
 
                 });
 
